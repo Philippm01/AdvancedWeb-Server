@@ -1,0 +1,6 @@
+@AdvancedWeb_Server_HostAddress = http://localhost:5201
+
+GET {{AdvancedWeb_Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
