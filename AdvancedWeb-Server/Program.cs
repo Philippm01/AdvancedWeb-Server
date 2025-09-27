@@ -6,8 +6,9 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-//Pasted code
-builder.Services.AddSwaggerGen(); // Adds the Swagger generator
+
+builder.Services.AddSwaggerGen(); 
+
 
 var app = builder.Build();
 
@@ -19,8 +20,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(); // Enables middleware to serve the Swagger UI
 }
 
+app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();
