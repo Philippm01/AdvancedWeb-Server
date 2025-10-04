@@ -1,13 +1,23 @@
+using Microsoft.EntityFrameworkCore;
+using WorldModel;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddDbContext<Comp584Context> (options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 
 builder.Services.AddSwaggerGen(); 
+
 
 
 var app = builder.Build();
