@@ -20,9 +20,9 @@ public partial class City
     [Unicode(false)]
     public string Name { get; set; } = null!;
 
-    public int Lat { get; set; }
+    public decimal Lat { get; set; }
 
-    public int Lng { get; set; }
+    public decimal Lng { get; set; }
 
     public int Population { get; set; }
 
