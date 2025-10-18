@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AdvancedWeb_Server.Data.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,23 @@ namespace AdvancedWeb_Server.Controllers
             return await context.Countries.ToListAsync();
         }
 
+
+        [HttpGet("population")]
+        public async Task<ActionResult<IEnumerable<PopulationDTO>>> GetCountriesPopulation()
+        {
+            return await context.Countries
+                .Select(c => new PopulationDTO
+                {
+                    ID = c.Id,
+                    Name = c.Name,
+                    Iso2 = c.Iso2,  
+                    Iso3 = c.Iso3,
+                    Population = c.Cities.Sum(city => city.Population)
+                }).
+                ToListAsync();
+        }
+
+
         // GET: api/Countries/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Country>> GetCountry(int id)
@@ -33,6 +51,28 @@ namespace AdvancedWeb_Server.Controllers
             }
 
             return country;
+        }
+
+        [HttpGet("population/{id}")]
+        public ActionResult<PopulationDTO> GetCountryPopulation(int id)
+        {
+            var x = context.Countries.Select(c => new PopulationDTO
+            {
+                ID = c.Id,
+                Name = c.Name,
+                Iso2 = c.Iso2,
+                Iso3 = c.Iso3,
+                Population = c.Cities.Sum(city => city.Population)
+            });
+
+            return context.Countries.Select(c => new PopulationDTO
+            {
+                ID = c.Id,
+                Name = c.Name,
+                Iso2 = c.Iso2,
+                Iso3 = c.Iso3,
+                Population = c.Cities.Sum(city => city.Population)
+            }).Single(c => c.ID == id);
         }
 
         // PUT: api/Countries/5
