@@ -1,7 +1,9 @@
 ﻿using AdvancedWeb_Server.Data;
+using Azure.Identity;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -12,29 +14,33 @@ namespace AdvancedWeb_Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class SeedController(Comp584Context context, IHostEnvironment environment) : ControllerBase
+    public class SeedController(Comp584Context context, IHostEnvironment environment, IConfiguration configuration,
+        RoleManager<IdentityRole> roleManager, UserManager<WorldModelUser> userManager
+        ) : ControllerBase
     {
         string _pathName = Path.Combine(environment.ContentRootPath, "Data/worldcities.csv");
-        [HttpPost ("Countries")]
+        [HttpPost("Countries")]
         public async Task<ActionResult> PostCountries()
         {
             Dictionary<string, Country> countries = await context.Countries.AsNoTracking().
                 ToDictionaryAsync(c => c.Name, StringComparer.OrdinalIgnoreCase);
             await context.SaveChangesAsync();
 
-            CsvConfiguration config = new(CultureInfo.InvariantCulture) { 
-                HasHeaderRecord = true, HeaderValidated = null 
+            CsvConfiguration config = new(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                HeaderValidated = null
             };
-            using StreamReader reader = new(_pathName); 
-            using CsvReader csv = new(reader, config); 
+            using StreamReader reader = new(_pathName);
+            using CsvReader csv = new(reader, config);
             List<Comp584csv> records = csv.GetRecords<Comp584csv>().ToList();
 
             foreach (Comp584csv record in records)
             {
                 if (!countries.ContainsKey(record.country))
                 {
-                    Country country = new() 
-                    { 
+                    Country country = new()
+                    {
                         Name = record.country,
                         Iso2 = record.iso2,
                         Iso3 = record.iso3
@@ -49,7 +55,7 @@ namespace AdvancedWeb_Server.Controllers
         }
 
 
-        [HttpPost ("Cities")]
+        [HttpPost("Cities")]
         public async Task<ActionResult> PostCities()
         {
 
@@ -91,5 +97,49 @@ namespace AdvancedWeb_Server.Controllers
             return new JsonResult(cityCount);
         }
 
+
+        [HttpPost("Users")]
+        public async Task<ActionResult> PostUsers()
+        {
+            string administrator = "administrator";
+            string registeredUser = "registereduser";
+            string user = "user";
+            if (!await roleManager.RoleExistsAsync(administrator))
+            {
+                await roleManager.CreateAsync(new IdentityRole(administrator));
+            }
+            if (!await roleManager.RoleExistsAsync(registeredUser))
+            {
+                await roleManager.CreateAsync(new IdentityRole(registeredUser));
+            }
+            WorldModelUser adminUser = new()
+            {
+                UserName = "admin",
+                Email = "dagobertduck@gmail.com",
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+
+            await userManager.CreateAsync(adminUser, configuration["DefaultPasswords:admin"]!);
+
+            await userManager.AddToRoleAsync(adminUser, administrator);
+
+
+            WorldModelUser regularUser = new()
+            {
+                UserName = "user",
+                Email = "donaldduck@gmail.com",
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                SecurityStamp = Guid.NewGuid().ToString(),
+            };
+
+            await userManager.CreateAsync(regularUser, configuration["DefaultPasswords:user"]!);
+
+            await userManager.AddToRoleAsync(regularUser, registeredUser);
+
+            return Ok();
+        }
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace WorldModel;
 
-public partial class Comp584Context : IdentityDbContext<WorldModelUser>
+public partial class Comp584Context : IdentityDbContext<WorldModelUser> // DbContext previously
 {
     public Comp584Context()
     {
@@ -35,6 +35,7 @@ public partial class Comp584Context : IdentityDbContext<WorldModelUser>
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<City>(entity =>
         {
             entity.HasOne(d => d.Country).WithMany(p => p.Cities)
