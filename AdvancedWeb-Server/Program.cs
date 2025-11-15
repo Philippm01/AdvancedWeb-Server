@@ -1,3 +1,4 @@
+using AdvancedWeb_Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WorldModel;
@@ -22,10 +23,9 @@ builder.Services.AddIdentity<WorldModelUser, IdentityRole>(options =>
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddScoped<JwtHandler>();
 
 builder.Services.AddSwaggerGen(); 
-
-
 
 var app = builder.Build();
 
