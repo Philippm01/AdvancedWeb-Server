@@ -19,7 +19,6 @@ namespace AdvancedWeb_Server.Controllers
             _logger = logger;
         }
 
-        [Authorize]
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {

@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Text;
 using WorldModel;
 
 namespace AdvancedWeb_Server
@@ -21,7 +22,7 @@ namespace AdvancedWeb_Server
         }
         private SigningCredentials GetSiningCredenials()
         {
-            byte[] key = Convert.FromBase64String(configuration["JwtSettings:SecretKey"]!);
+            byte[] key = Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!);
             var signingkey = new SymmetricSecurityKey(key);
             return new SigningCredentials(signingkey, SecurityAlgorithms.HmacSha256);
         }
